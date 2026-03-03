@@ -1,0 +1,79 @@
+---
+const projects = [
+  {
+    title: 'CLI Task Manager',
+    description:
+      'A fast, keyboard-driven task manager built in Rust. Supports projects, priorities, and due dates with a minimal terminal UI.',
+    tech: ['Rust', 'TUI', 'SQLite'],
+    github: 'https://github.com',
+    live: null,
+    accent: 'from-indigo-500 to-violet-600',
+  },
+  {
+    title: 'Distributed Key-Value Store',
+    description:
+      'A toy implementation of a linearizable key-value store using the Raft consensus algorithm. Educational project exploring distributed systems.',
+    tech: ['Go', 'Raft', 'gRPC'],
+    github: 'https://github.com',
+    live: null,
+    accent: 'from-cyan-500 to-blue-600',
+  },
+  {
+    title: 'Developer Dashboard',
+    description:
+      'A self-hosted dashboard aggregating metrics from GitHub, CI/CD pipelines, and uptime monitors into a single glanceable view.',
+    tech: ['TypeScript', 'React', 'PostgreSQL'],
+    github: 'https://github.com',
+    live: 'https://example.com',
+    accent: 'from-emerald-500 to-teal-600',
+  },
+];
+---
+
+<section id="projects" class="py-20 bg-white">
+  <div class="max-w-5xl mx-auto px-6">
+    <h2 class="text-3xl font-bold text-navy mb-12">Projects</h2>
+    <div class="grid md:grid-cols-3 gap-6">
+      {
+        projects.map((project) => (
+          <div class="relative bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow duration-200">
+            <!-- Accent bar -->
+            <div
+              class={`absolute top-0 left-0 right-0 h-1 rounded-t-xl bg-gradient-to-r ${project.accent}`}
+            />
+
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">{project.title}</h3>
+            <p class="text-gray-600 text-sm leading-relaxed mb-4">{project.description}</p>
+
+            <div class="flex flex-wrap gap-1 mb-4">
+              {project.tech.map((tag) => (
+                <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">{tag}</span>
+              ))}
+            </div>
+
+            <div class="flex gap-3">
+              <a
+                href={project.github}
+                class="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GitHub →
+              </a>
+              {project.live && (
+                <a
+                  href={project.live}
+                  class="text-sm text-gray-500 hover:text-gray-700 font-medium"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Live →
+                </a>
+              )}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

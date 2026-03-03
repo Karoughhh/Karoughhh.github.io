@@ -1,0 +1,39 @@
+---
+const skills = [
+  'TypeScript', 'React', 'Node.js', 'Python', 'PostgreSQL',
+  'Docker', 'Linux', 'Astro', 'Tailwind CSS', 'Git',
+];
+---
+
+<section id="about" class="py-20 bg-gray-50">
+  <div class="max-w-5xl mx-auto px-6">
+    <h2 class="text-3xl font-bold text-navy mb-12">About</h2>
+    <div class="grid md:grid-cols-2 gap-12 items-start">
+      <!-- Bio -->
+      <div>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          I'm a software developer focused on building reliable systems and useful tools.
+          I care about writing maintainable code and shipping products that solve real problems.
+        </p>
+        <p class="text-gray-600 leading-relaxed mb-8">
+          When I'm not coding, I'm reading about distributed systems, contributing to
+          open source, or writing on this blog.
+        </p>
+        <div class="flex flex-wrap gap-2">
+          {skills.map((skill) => (
+            <span class="px-3 py-1 bg-white border border-gray-200 text-gray-700 text-sm rounded-full">
+              {skill}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <!-- Avatar placeholder -->
+      <div class="flex justify-center md:justify-end">
+        <div class="w-48 h-48 rounded-2xl bg-gradient-to-br from-indigo-100 to-violet-100 border border-gray-200 flex items-center justify-center">
+          <span class="text-6xl">👤</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
