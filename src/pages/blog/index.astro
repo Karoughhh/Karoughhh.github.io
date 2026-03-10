@@ -4,49 +4,164 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { getCollection } from 'astro:content';
 
-const allPosts = await getCollection('blog', ({ data }) => !data.draft);
-const posts = allPosts.sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
+const sortByDate = (a: { data: { pubDate: Date } }, b: { data: { pubDate: Date } }) =>
+  b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+
+const biosecurityPosts = (await getCollection('biosecurity', ({ data }) => !data.draft)).sort(sortByDate);
+const writingPosts = (await getCollection('writing', ({ data }) => !data.draft)).sort(sortByDate);
+const notesPosts = (await getCollection('notes', ({ data }) => !data.draft)).sort(sortByDate);
+
+const sections = [
+  {
+    id: 'biosecurity',
+    label: 'Biosecurity',
+    description: 'Analysis, commentary, and research on biosecurity, biosafety, and global health security.',
+    accent: 'from-emerald-500 to-teal-600',
+    tagBg: 'bg-emerald-50',
+    tagText: 'text-emerald-700',
+    posts: biosecurityPosts,
+    prefix: '/blog/biosecurity',
+  },
+  {
+    id: 'writing',
+    label: 'Writing',
+    description: 'Essays and long-form pieces on technology, ideas, and the craft of software.',
+    accent: 'from-indigo-500 to-violet-600',
+    tagBg: 'bg-indigo-50',
+    tagText: 'text-indigo-700',
+    posts: writingPosts,
+    prefix: '/blog/writing',
+  },
+  {
+    id: 'notes',
+    label: 'Notes',
+    description: 'Short notes, links, and thoughts too brief for a full post.',
+    accent: 'from-amber-400 to-orange-500',
+    tagBg: 'bg-amber-50',
+    tagText: 'text-amber-700',
+    posts: notesPosts,
+    prefix: '/blog/notes',
+  },
+] as const;
 ---
 
-<Layout
-  title="Blog — Your Name"
-  description="Writing on software development, systems, and tooling."
->
+<Layout title="Blog — Your Name" description="Writing on biosecurity, software, and ideas.">
   <Header />
-  <main class="max-w-2xl mx-auto px-6 py-16">
-    <h1 class="text-4xl font-bold text-navy mb-4">Blog</h1>
-    <p class="text-gray-600 mb-12">Thoughts on software, systems, and building things.</p>
+  <main class="max-w-5xl mx-auto px-6 py-16">
+    <h1 class="text-4xl font-bold text-navy mb-2">Blog</h1>
+    <p class="text-gray-500 mb-10">Biosecurity research, essays, and short notes.</p>
 
-    <div class="space-y-6">
+    <!-- Tab bar -->
+    <div role="tablist" aria-label="Blog sections" class="flex gap-2 mb-10 flex-wrap">
       {
-        posts.map((post) => (
-          <a href={`/blog/${post.slug}`} class="block group">
-            <article class="border-b border-gray-100 pb-6">
-              <div class="flex flex-wrap gap-1 mb-2">
-                {post.data.tags.map((tag: string) => (
-                  <span class="px-2 py-0.5 bg-indigo-50 text-indigo-700 text-xs rounded font-medium">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              <h2 class="text-xl font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors mb-1">
-                {post.data.title}
-              </h2>
-              <p class="text-gray-600 text-sm mb-2">{post.data.description}</p>
-              <time class="text-xs text-gray-400">
-                {post.data.pubDate.toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </time>
-            </article>
-          </a>
+        sections.map((section, i) => (
+          <button
+            role="tab"
+            data-tab={section.id}
+            data-accent={section.accent}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            aria-controls={`panel-${section.id}`}
+            class:list={[
+              'px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer',
+              i === 0
+                ? `bg-gradient-to-r ${section.accent} text-white shadow-sm`
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+            ]}
+          >
+            {section.label}
+            <span class="ml-1.5 opacity-70">({section.posts.length})</span>
+          </button>
         ))
       }
     </div>
+
+    <!-- Panels -->
+    {
+      sections.map((section, i) => (
+        <div
+          role="tabpanel"
+          id={`panel-${section.id}`}
+          data-panel={section.id}
+          hidden={i !== 0}
+        >
+          <p class="text-gray-500 text-sm mb-8">{section.description}</p>
+
+          {section.posts.length > 0 ? (
+            <div class="grid md:grid-cols-3 gap-6">
+              {section.posts.map((post) => (
+                <a
+                  href={`${section.prefix}/${post.slug}`}
+                  class="relative block bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow duration-200"
+                >
+                  <div
+                    class={`absolute top-0 left-0 right-0 h-1 rounded-t-xl bg-gradient-to-r ${section.accent}`}
+                  />
+                  <div class="flex flex-wrap gap-1 mb-3">
+                    {post.data.tags.slice(0, 2).map((tag) => (
+                      <span
+                        class={`px-2 py-0.5 ${section.tagBg} ${section.tagText} text-xs rounded font-medium`}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <h3 class="text-base font-semibold text-gray-900 mb-2">{post.data.title}</h3>
+                  <p class="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2">
+                    {post.data.description}
+                  </p>
+                  <time class="text-xs text-gray-400">
+                    {post.data.pubDate.toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </time>
+                </a>
+              ))}
+            </div>
+          ) : (
+            <div class="border border-dashed border-gray-200 rounded-xl p-16 text-center">
+              <p class="text-2xl mb-3">✦</p>
+              <p class="text-gray-400 text-sm font-medium">Nothing here yet.</p>
+              <p class="text-gray-400 text-xs mt-1">Check back soon.</p>
+            </div>
+          )}
+        </div>
+      ))
+    }
   </main>
   <Footer />
 </Layout>
+
+<script>
+  const tabs = document.querySelectorAll<HTMLButtonElement>('[data-tab]');
+  const panels = document.querySelectorAll<HTMLElement>('[data-panel]');
+
+  function activate(tabId: string) {
+    tabs.forEach((tab) => {
+      const isActive = tab.dataset.tab === tabId;
+      tab.setAttribute('aria-selected', String(isActive));
+      if (isActive) {
+        const accent = tab.dataset.accent ?? '';
+        tab.className = `px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer bg-gradient-to-r ${accent} text-white shadow-sm`;
+      } else {
+        tab.className =
+          'px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer bg-gray-100 text-gray-600 hover:bg-gray-200';
+      }
+    });
+    panels.forEach((panel) => {
+      panel.hidden = panel.dataset.panel !== tabId;
+    });
+    history.replaceState(null, '', `#${tabId}`);
+  }
+
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => activate(tab.dataset.tab!));
+  });
+
+  // Restore active tab from URL hash
+  const hash = location.hash.slice(1);
+  if (hash && [...tabs].some((t) => t.dataset.tab === hash)) {
+    activate(hash);
+  }
+</script>

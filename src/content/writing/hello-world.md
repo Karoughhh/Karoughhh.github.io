@@ -1,6 +1,6 @@
 ---
 title: "Hello World"
-description: "This is the first post on my blog. A quick introduction to what I plan to write about."
+description: "A quick introduction to what I plan to write about and why I started this blog."
 pubDate: 2026-03-01
 tags: ["meta", "writing"]
 draft: false
